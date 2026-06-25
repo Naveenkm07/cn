@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment 12: ICMP, PING & Traceroute Masterclass</title>
+    <style>
+        /* Modern Premium CSS Design */
+        :root {
+            --primary: #1a56db;
+            --secondary: #3b82f6;
+            --bg-color: #f4f7f6;
+            --text-main: #333;
+            --terminal-bg: #0f172a;
+            --terminal-text: #10b981; /* Hacker green */
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: var(--primary);
+            border-bottom: 3px solid #e5e7eb;
+            padding-bottom: 15px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        h2 {
+            color: var(--secondary);
+            margin-top: 40px;
+            font-size: 1.8em;
+            border-left: 5px solid var(--secondary);
+            padding-left: 15px;
+        }
+        h3 {
+            color: #4b5563;
+            font-size: 1.4em;
+        }
+        p {
+            font-size: 1.1em;
+        }
+        .step-container {
+            background: #eff6ff;
+            border-left: 5px solid var(--secondary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .step-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .concept-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .concept-title {
+            color: #d97706;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        /* Terminal Mockups */
+        .terminal-mockup {
+            background: var(--terminal-bg);
+            color: var(--terminal-text);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1em;
+        }
+        .terminal-header {
+            background: #1e293b;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+            margin-right: 15px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        .terminal-body {
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        .cmd-input {
+            color: #fff;
+            font-weight: bold;
+        }
+        /* Wireshark Mockups */
+        .wireshark-mockup {
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .ws-toolbar {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-bottom: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .ws-filter-bar {
+            flex-grow: 1;
+            background: #dcfce7;
+            border: 1px solid #22c55e;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #166534;
+        }
+        .ws-packet-list {
+            background: white;
+            font-family: 'Consolas', monospace;
+            font-size: 0.95em;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .ws-header-row {
+            display: grid;
+            grid-template-columns: 50px 100px 150px 150px 80px 300px;
+            background: #e2e8f0;
+            padding: 8px 15px;
+            font-weight: bold;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .ws-row {
+            display: grid;
+            grid-template-columns: 50px 100px 150px 150px 80px 300px;
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .ws-row:nth-child(even) { background: #f8fafc; }
+        .ws-row.highlight-ping { background: #fef08a; } /* Yellow for ICMP */
+        .ws-row.highlight-error { background: #fca5a5; } /* Red for ICMP Errors */
+        .ws-packet-details {
+            padding: 15px;
+            background: white;
+            font-family: 'Consolas', monospace;
+            height: auto;
+        }
+        .tree-node {
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .tree-node::before {
+            content: "▶ ";
+            color: #64748b;
+            font-size: 0.8em;
+        }
+        .tree-node.expanded::before {
+            content: "▼ ";
+        }
+        .tree-child {
+            margin-left: 20px;
+            color: #334155;
+            border-left: 1px dashed #cbd5e1;
+            padding-left: 10px;
+        }
+        /* Table Design */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.1em;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Experiment 12: ICMP, PING & Traceroute Masterclass</h1>
+    <p>Welcome to the comprehensive guide for understanding how the Internet tests itself! In this experiment, we will use the <strong>ICMP (Internet Control Message Protocol)</strong> to diagnose networks using two fundamental tools: <code>ping</code> and <code>traceroute</code>.</p>
+
+    <div class="concept-box">
+        <div class="concept-title">🧠 Core Concept: What is ICMP?</div>
+        <p>ICMP is the diagnostic protocol of the Internet (Layer 3). It doesn't carry user data (like HTTP or TCP does). Instead, it carries <strong>error messages</strong> and <strong>operational information</strong>. If a router is down, or a destination is unreachable, ICMP is the protocol that reports the problem back to the sender.</p>
+    </div>
+
+    <!-- ==========================================
+         PART A: PING
+         ========================================== -->
+    <h2>Part A: Analysis of ICMP and PING Messages</h2>
+    
+    <div class="step-container">
+        <div class="step-title">Step 1: Running the PING Command</div>
+        <p>Open your Command Prompt (Windows) or Terminal (Linux/Mac). To test if a server is alive, we send an "Echo Request".</p>
+        <p>Type <code>ping google.com</code> and press Enter.</p>
+    </div>
+
+    <div class="terminal-mockup">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+            </div>
+            Command Prompt
+        </div>
+        <div class="terminal-body">C:\Users\Student> <span class="cmd-input">ping google.com</span>
+
+Pinging google.com [142.250.181.14] with 32 bytes of data:
+Reply from 142.250.181.14: bytes=32 time=20ms TTL=54
+Reply from 142.250.181.14: bytes=32 time=21ms TTL=54
+Reply from 142.250.181.14: bytes=32 time=20ms TTL=54
+Reply from 142.250.181.14: bytes=32 time=19ms TTL=54
+
+Ping statistics for 142.250.181.14:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 19ms, Maximum = 21ms, Average = 20ms</div>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 2: Understanding the Output</div>
+        <ul>
+            <li><strong>TTL (Time to Live):</strong> Every time a packet passes through a router, TTL drops by 1. If TTL hits 0, the packet is destroyed (to prevent infinite loops in the network). Here, it arrived with 54 hops remaining.</li>
+            <li><strong>Time (RTT - Round Trip Time):</strong> It took 20 milliseconds to travel to Google's server and come back to your computer.</li>
+            <li><strong>Packet Loss:</strong> 0% means the network is highly reliable!</li>
+        </ul>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 3: What it looks like in Wireshark</div>
+        <p>If you were capturing this on Wireshark using the filter <code>icmp</code>, you would see this back-and-forth conversation:</p>
+    </div>
+
+    <div class="wireshark-mockup">
+        <div class="ws-toolbar">
+            <div class="ws-filter-bar">icmp</div>
+        </div>
+        <div class="ws-packet-list">
+            <div class="ws-header-row">
+                <div>No.</div><div>Time</div><div>Source</div><div>Destination</div><div>Protocol</div><div>Info</div>
+            </div>
+            <div class="ws-row highlight-ping">
+                <div>1</div><div>0.000</div><div>192.168.1.5</div><div>142.250.181.14</div><div>ICMP</div><div>Echo (ping) request  id=0x0001, seq=1/256, ttl=128</div>
+            </div>
+            <div class="ws-row highlight-ping">
+                <div>2</div><div>0.020</div><div>142.250.181.14</div><div>192.168.1.5</div><div>ICMP</div><div>Echo (ping) reply    id=0x0001, seq=1/256, ttl=54</div>
+            </div>
+        </div>
+        <div class="ws-packet-details">
+            <div class="tree-node expanded">Internet Control Message Protocol</div>
+            <div class="tree-child"><strong>Type:</strong> 8 (Echo (ping) request)</div>
+            <div class="tree-child"><strong>Code:</strong> 0</div>
+            <div class="tree-child"><strong>Checksum:</strong> 0x4d5a [correct]</div>
+            <div class="tree-child"><strong>Identifier (BE):</strong> 1 (0x0001)</div>
+            <div class="tree-child"><strong>Sequence Number (BE):</strong> 1 (0x0001)</div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         PART B: TRACEROUTE
+         ========================================== -->
+    <h2 style="margin-top: 60px;">Part B: Analysis of ICMP and Traceroute Messages</h2>
+    
+    <div class="concept-box" style="background:#e0e7ff; border-color:#6366f1;">
+        <div class="concept-title" style="color:#4338ca;">🕵️‍♂️ Concept Check: The TTL Trick!</div>
+        <p>Traceroute is a genius hack. How do we find out the IP address of every router between us and Google? <br><br>
+        We intentionally break packets by manipulating the <strong>TTL (Time to Live)</strong>! <br>
+        - We send a ping to Google with <code>TTL=1</code>. The very 1st router receives it, drops TTL to 0, kills the packet, and angrily replies: <em>"Hey! Time Exceeded!"</em> (Boom, we just learned the 1st router's IP).<br>
+        - Then we send a ping with <code>TTL=2</code>. It survives the 1st router, but the 2nd router kills it and replies. (Boom, we have the 2nd router's IP).<br>
+        We keep increasing TTL until we finally hit Google!</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 1: Running the Traceroute Command</div>
+        <p>Open your Command Prompt. Type <code>tracert google.com</code> (on Windows) or <code>traceroute google.com</code> (on Linux/Mac) and press Enter.</p>
+    </div>
+
+    <div class="terminal-mockup">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+            </div>
+            Command Prompt
+        </div>
+        <div class="terminal-body">C:\Users\Student> <span class="cmd-input">tracert google.com</span>
+
+Tracing route to google.com [142.250.181.14] over a maximum of 30 hops:
+
+  1    <1 ms    <1 ms    <1 ms  192.168.1.1 (Your Home Router)
+  2     5 ms     4 ms     4 ms  10.10.10.1 (ISP Gateway)
+  3    10 ms     9 ms     9 ms  172.217.9.1 (Regional ISP Node)
+  4    12 ms    11 ms    12 ms  142.250.181.14 (Google Server)
+
+Trace complete.</div>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 2: What it looks like in Wireshark</div>
+        <p>If you capture this process, you will see a bunch of ICMP Error messages coming back from all the different routers.</p>
+    </div>
+
+    <div class="wireshark-mockup">
+        <div class="ws-toolbar">
+            <div class="ws-filter-bar">icmp</div>
+        </div>
+        <div class="ws-packet-list">
+            <div class="ws-header-row">
+                <div>No.</div><div>Time</div><div>Source</div><div>Destination</div><div>Protocol</div><div>Info</div>
+            </div>
+            <div class="ws-row highlight-ping">
+                <div>1</div><div>0.000</div><div>192.168.1.5</div><div>142.250.181.14</div><div>ICMP</div><div>Echo (ping) request  ttl=1</div>
+            </div>
+            <div class="ws-row highlight-error">
+                <div>2</div><div>0.001</div><div>192.168.1.1</div><div>192.168.1.5</div><div>ICMP</div><div>Time-to-live exceeded (Fragment reassembly time exceeded)</div>
+            </div>
+            <div class="ws-row highlight-ping">
+                <div>3</div><div>0.005</div><div>192.168.1.5</div><div>142.250.181.14</div><div>ICMP</div><div>Echo (ping) request  ttl=2</div>
+            </div>
+            <div class="ws-row highlight-error">
+                <div>4</div><div>0.009</div><div>10.10.10.1</div><div>192.168.1.5</div><div>ICMP</div><div>Time-to-live exceeded (Fragment reassembly time exceeded)</div>
+            </div>
+        </div>
+        <div class="ws-packet-details">
+            <div class="tree-node expanded">Internet Control Message Protocol</div>
+            <div class="tree-child"><strong>Type:</strong> 11 (Time-to-live exceeded)</div>
+            <div class="tree-child"><strong>Code:</strong> 0 (Time to live exceeded in transit)</div>
+            <div class="tree-child"><strong>Checksum:</strong> 0xfe4a [correct]</div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         COMPARISON
+         ========================================== -->
+    <h2 style="margin-top: 60px;">Ultimate Comparison: PING vs Traceroute</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>PING</th>
+                <th>Traceroute</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Primary Purpose</strong></td>
+                <td>Test if a single destination host is alive and reachable.</td>
+                <td>Trace the exact path (every router) packets take to reach the destination.</td>
+            </tr>
+            <tr>
+                <td><strong>ICMP Types Used</strong></td>
+                <td>Type 8 (Echo Request) & Type 0 (Echo Reply)</td>
+                <td>Type 11 (Time Exceeded) & Type 0 (Echo Reply)</td>
+            </tr>
+            <tr>
+                <td><strong>TTL Behavior</strong></td>
+                <td>Fixed TTL (e.g., starts at 64 or 128 and drops naturally).</td>
+                <td>Artificially starts at TTL=1, then increases (TTL=2, TTL=3) on purpose!</td>
+            </tr>
+            <tr>
+                <td><strong>What you see on screen</strong></td>
+                <td>Overall Round-trip time (RTT) and total packet loss %.</td>
+                <td>List of every single hop (router) along the route with specific hop delays.</td>
+            </tr>
+            <tr>
+                <td><strong>Best Use Case</strong></td>
+                <td>Basic connectivity check. "Is the server up?"</td>
+                <td>Detailed network troubleshooting. "Where exactly is the network broken?"</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="text-align: center; margin-top: 50px; padding: 20px; background: #e2e8f0; border-radius: 8px;">
+        <h3 style="margin-top:0;">🎉 You have mastered Experiment 12!</h3>
+        <p>Remember: PING uses Type 8 / Type 0. Traceroute uses the "TTL trick" to force routers to send Type 11 errors.</p>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment 8: The Ultimate Wireshark Masterclass</title>
+    <style>
+        /* Modern Premium CSS Design */
+        :root {
+            --primary: #1a56db;
+            --secondary: #3b82f6;
+            --bg-color: #f4f7f6;
+            --text-main: #333;
+            --code-bg: #1e293b;
+            --code-text: #10b981;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: var(--primary);
+            border-bottom: 3px solid #e5e7eb;
+            padding-bottom: 15px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        h2 {
+            color: var(--secondary);
+            margin-top: 40px;
+            font-size: 1.8em;
+            border-left: 5px solid var(--secondary);
+            padding-left: 15px;
+        }
+        h3 {
+            color: #4b5563;
+            font-size: 1.4em;
+        }
+        p {
+            font-size: 1.1em;
+        }
+        .step-container {
+            background: #eff6ff;
+            border-left: 5px solid var(--secondary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .step-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .filter-box {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 12px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 10px 0;
+            letter-spacing: 1px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .concept-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .concept-title {
+            color: #d97706;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        /* Wireshark Mockups */
+        .wireshark-mockup {
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .ws-toolbar {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-bottom: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .ws-icon-fin {
+            background: #0ea5e9;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .ws-icon-stop {
+            background: #ef4444;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .ws-filter-bar {
+            flex-grow: 1;
+            background: #dcfce7;
+            border: 1px solid #22c55e;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #166534;
+        }
+        .ws-packet-list {
+            background: white;
+            font-family: 'Consolas', monospace;
+            font-size: 0.95em;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .ws-header-row {
+            display: grid;
+            grid-template-columns: 50px 100px 150px 150px 80px 300px;
+            background: #e2e8f0;
+            padding: 8px 15px;
+            font-weight: bold;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .ws-row {
+            display: grid;
+            grid-template-columns: 50px 100px 150px 150px 80px 300px;
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .ws-row:nth-child(even) { background: #f8fafc; }
+        .ws-row.highlight { background: #bfdbfe; }
+        .ws-packet-details {
+            padding: 15px;
+            background: white;
+            font-family: 'Consolas', monospace;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .tree-node {
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .tree-node::before {
+            content: "▶ ";
+            color: #64748b;
+            font-size: 0.8em;
+        }
+        .tree-node.expanded::before {
+            content: "▼ ";
+        }
+        .tree-child {
+            margin-left: 20px;
+            color: #334155;
+            border-left: 1px dashed #cbd5e1;
+            padding-left: 10px;
+        }
+        .keyboard-key {
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-weight: bold;
+            box-shadow: 0 2px 0 #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Experiment 8: Comprehensive Wireshark Analysis</h1>
+    <p>Welcome to the ultimate step-by-step guide for analyzing network traffic. This interactive tutorial will hold your hand through every single click, filter, and packet dissection required for your exam.</p>
+
+    <!-- ==========================================
+         PART A: ETHERNET FRAMES
+         ========================================== -->
+    <h2>Part A: Capturing and Analyzing Ethernet Frames</h2>
+    
+    <div class="concept-box">
+        <div class="concept-title">🧠 Concept Check: What is an Ethernet Frame?</div>
+        <p>In the OSI model, Layer 2 (Data Link Layer) deals with MAC addresses. When your computer sends data to your router, it packages the data into an "Ethernet Frame". This frame contains the physical MAC address of your computer (Source) and your router (Destination).</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 1: Open Wireshark and Select Interface</div>
+        <p>When you open Wireshark, you will see a list of network interfaces (like Wi-Fi or Ethernet). Look for the one that has a <strong>squiggly line graph</strong> moving up and down—this means it has active internet traffic. Double-click that interface to start capturing.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 2: The Capture Screen & How to Stop</div>
+        <p>Immediately, your screen will fill up with hundreds of colorful rows. Let it run for 5 seconds while you open a website in your browser. Then, stop the capture.</p>
+        <p><strong>Where to click:</strong> Click the <span class="ws-icon-stop">⬛ Red Square</span> icon in the top left toolbar to stop capturing.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 3: Apply the Filter</div>
+        <p>We only want to see Ethernet traffic. At the top of the screen, you will see a long text bar. This is the display filter.</p>
+        <p>Type the following and press <span class="keyboard-key">Enter</span> (the bar will turn green when the syntax is correct):</p>
+        <div class="filter-box">eth</div>
+    </div>
+
+    <!-- UI Mockup for Part A -->
+    <div class="wireshark-mockup">
+        <div class="ws-toolbar">
+            <div class="ws-icon-fin">🦈 Start</div>
+            <div class="ws-icon-stop">⬛ Stop</div>
+            <div class="ws-filter-bar">eth</div>
+        </div>
+        <div class="ws-packet-list">
+            <div class="ws-header-row">
+                <div>No.</div><div>Time</div><div>Source</div><div>Destination</div><div>Protocol</div><div>Info</div>
+            </div>
+            <div class="ws-row highlight">
+                <div>1</div><div>0.000</div><div>IntelCor_a1:b2</div><div>Netgear_c3:d4</div><div>ARP</div><div>Who has 192.168.1.1? Tell 192.168.1.5</div>
+            </div>
+            <div class="ws-row">
+                <div>2</div><div>0.002</div><div>Netgear_c3:d4</div><div>IntelCor_a1:b2</div><div>IPv4</div><div>192.168.1.1 -> 192.168.1.5 Len=84</div>
+            </div>
+        </div>
+        <div class="ws-packet-details">
+            <div class="tree-node">Frame 1: 42 bytes on wire</div>
+            <div class="tree-node expanded">Ethernet II, Src: IntelCor_a1:b2:c3 (00:1A:2B:3C:4D:5E), Dst: Netgear_c3:d4:e5 (F0:E1:D2:C3:B4:A5)</div>
+            <div class="tree-child"><strong>Destination:</strong> Netgear_c3:d4:e5 (F0:E1:D2:C3:B4:A5)</div>
+            <div class="tree-child"><strong>Source:</strong> IntelCor_a1:b2:c3 (00:1A:2B:3C:4D:5E)</div>
+            <div class="tree-child"><strong>Type:</strong> IPv4 (0x0800)</div>
+        </div>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 4: Analyze the Packet</div>
+        <p>Click on any row in the top packet list (it will turn blue). Now look at the middle pane (the Packet Details pane).</p>
+        <p><strong>Where to click:</strong> Look for the line that says <code>Ethernet II</code>. Click the small arrow <code>&gt;</code> next to it to expand it.</p>
+        <p>You must write down these three things in your exam record:</p>
+        <ul>
+            <li><strong>Destination MAC Address:</strong> Where the frame is going (e.g., your router's hardware address).</li>
+            <li><strong>Source MAC Address:</strong> Where it came from (your laptop's hardware address).</li>
+            <li><strong>Type:</strong> Usually shows <code>IPv4 (0x0800)</code>, proving that the Ethernet frame is carrying an IP packet inside it.</li>
+        </ul>
+    </div>
+
+
+    <!-- ==========================================
+         PART B: HTTP GET / POST
+         ========================================== -->
+    <h2>Part B: Simulate HTTP GET/POST Interaction</h2>
+
+    <div class="concept-box">
+        <div class="concept-title">🧠 Concept Check: GET vs POST</div>
+        <p><strong>GET:</strong> Used when you request data (like opening a webpage). Variables are sent in the URL.<br>
+        <strong>POST:</strong> Used when you submit data (like a login form). Variables are hidden securely inside the body of the HTTP request.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 1: Capture HTTP GET</div>
+        <p>1. Start a new capture (click the blue shark fin). If it asks to save, click "Continue without saving".</p>
+        <p>2. Open Google Chrome and visit a non-secure website like <code>http://example.com</code> or <code>http://neverssl.com</code>. (Note: It MUST be HTTP, not HTTPS. HTTPS is encrypted and you won't see the text!)</p>
+        <p>3. Stop the capture.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 2: Filter and Analyze GET</div>
+        <p>Type the following in the filter bar:</p>
+        <div class="filter-box">http</div>
+        <p>Look for a packet in the list that says <code>GET / HTTP/1.1</code>. Click it.</p>
+        <p><strong>Where to click:</strong> In the middle pane, expand <code>Hypertext Transfer Protocol</code>.</p>
+        <ul>
+            <li>Notice the <strong>Method:</strong> GET</li>
+            <li>Right below it, find the response packet from the server. It will say <code>HTTP/1.1 200 OK</code>. This means the server successfully found the website.</li>
+        </ul>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 3: Capture HTTP POST</div>
+        <p>1. Start a new capture.</p>
+        <p>2. Open Chrome and go to a testing site like <code>http://httpbin.org/forms/post</code>.</p>
+        <p>3. Fill out the fake form with a dummy username/password and click Submit.</p>
+        <p>4. Stop the capture in Wireshark.</p>
+        <p>Apply this specific filter to find your POST request instantly:</p>
+        <div class="filter-box">http.request.method == "POST"</div>
+        <p><strong>Where to click:</strong> Expand the HTTP section. Scroll to the very bottom of the middle pane and expand <code>HTML Form URL Encoded</code>. Here you will see the exact username and password you typed in plain text!</p>
+    </div>
+
+
+    <!-- ==========================================
+         PART C: BULK TCP TRANSFER
+         ========================================== -->
+    <h2>Part C: Simulate Capturing a Bulk TCP Transfer</h2>
+
+    <div class="concept-box">
+        <div class="concept-title">🧠 Concept Check: The TCP Handshake</div>
+        <p>Before TCP sends a massive file, it must establish a connection using a 3-way handshake:<br>
+        1. <strong>SYN:</strong> Client says "Hello, can we talk?"<br>
+        2. <strong>SYN-ACK:</strong> Server says "Yes we can, here are my rules."<br>
+        3. <strong>ACK:</strong> Client says "Understood, sending data now."</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 1: Download a Large File</div>
+        <p>Start a capture. Go to your browser and download a relatively large file (e.g., a 50MB PDF or software installer). Stop the capture once the download finishes.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 2: Analyze the Handshake and Data</div>
+        <p>Type the following in the filter bar:</p>
+        <div class="filter-box">tcp</div>
+        <p><strong>1. TCP 3-Way Handshake:</strong> Scroll to the top of your TCP packets. Look at the "Info" column for packets marked <code>[SYN]</code>, <code>[SYN, ACK]</code>, and <code>[ACK]</code>.</p>
+        <p><strong>2. Data Transfer:</strong> Look at the middle pane under <code>Transmission Control Protocol</code>. Observe the <strong>Sequence Numbers (Seq)</strong> and <strong>Acknowledgments (Ack)</strong>. You will notice the Seq number increasing exactly by the size of the data sent!</p>
+        <p><strong>3. Window Size:</strong> Look for the <code>Window size value</code>. This is Flow Control in action—it tells the sender how much buffer space the receiver has left.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 3: The Magic Trick - Follow TCP Stream</div>
+        <p>If you want to see the entire conversation assembled together, do this:</p>
+        <p><strong>Where to click:</strong> Right-click on ANY of the TCP packets belonging to your download. In the menu that pops up, click <strong>Follow</strong> → <strong>TCP Stream</strong>.</p>
+        <p>A new window will pop up showing the raw data stream. Client requests will be in <span style="color:#ef4444; font-weight:bold;">Red</span>, and Server responses will be in <span style="color:#1a56db; font-weight:bold;">Blue</span>.</p>
+    </div>
+
+    <div class="step-container">
+        <div class="step-title">Step 4: Connection Termination</div>
+        <p>When the download is finished, TCP politely closes the connection. Scroll to the very bottom of your specific connection packets.</p>
+        <p>Look for the <code>[FIN, ACK]</code> flag. This stands for "Finish". The other side will reply with an <code>[ACK]</code>, gracefully closing the socket.</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; padding: 20px; background: #e2e8f0; border-radius: 8px;">
+        <h3 style="margin-top:0;">🎉 You are now ready to ace Experiment 8!</h3>
+        <p>Remember: Ethernet is Layer 2 (MAC). IP is Layer 3 (Routing). TCP is Layer 4 (Reliability). HTTP is Layer 7 (Application).</p>
+    </div>
+
+</div>
+
+</body>
+</html>
