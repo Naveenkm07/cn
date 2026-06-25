@@ -3,16 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiment 12: ICMP, PING & Traceroute Masterclass</title>
+    <title>Experiment 12: ICMP, PING & Traceroute Masterclass (Dark Mode)</title>
     <style>
-        /* Modern Premium CSS Design */
+        /* Modern Premium Dark Mode CSS */
         :root {
-            --primary: #1a56db;
+            --primary: #60a5fa;
             --secondary: #3b82f6;
-            --bg-color: #f4f7f6;
-            --text-main: #333;
-            --terminal-bg: #0f172a;
+            --bg-color: #0f172a;
+            --text-main: #f8fafc;
+            --terminal-bg: #020617;
             --terminal-text: #10b981; /* Hacker green */
+            --container-bg: #1e293b;
+            --border-color: #334155;
+            --step-bg: #334155;
+            --concept-bg: #451a03;
+            --concept-border: #f59e0b;
+            --concept-text: #fcd34d;
+            --ws-toolbar-bg: #0f172a;
+            --ws-header-bg: #334155;
+            --ws-row-odd: #1e293b;
+            --ws-row-even: #0f172a;
+            --ws-details-bg: #0f172a;
+            --text-muted: #94a3b8;
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -25,39 +37,39 @@
         .container {
             max-width: 1100px;
             margin: 40px auto;
-            background: #fff;
+            background: var(--container-bg);
             padding: 50px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         h1 {
             color: var(--primary);
-            border-bottom: 3px solid #e5e7eb;
+            border-bottom: 3px solid var(--border-color);
             padding-bottom: 15px;
             font-size: 2.5em;
             text-align: center;
         }
         h2 {
-            color: var(--secondary);
+            color: var(--primary);
             margin-top: 40px;
             font-size: 1.8em;
             border-left: 5px solid var(--secondary);
             padding-left: 15px;
         }
         h3 {
-            color: #4b5563;
+            color: #cbd5e1;
             font-size: 1.4em;
         }
         p {
             font-size: 1.1em;
         }
         .step-container {
-            background: #eff6ff;
+            background: var(--step-bg);
             border-left: 5px solid var(--secondary);
             padding: 20px;
             margin: 20px 0;
             border-radius: 0 8px 8px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .step-title {
             font-weight: bold;
@@ -66,14 +78,14 @@
             margin-bottom: 10px;
         }
         .concept-box {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
+            background: var(--concept-bg);
+            border: 1px solid var(--concept-border);
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
         }
         .concept-title {
-            color: #d97706;
+            color: var(--concept-text);
             font-weight: bold;
             font-size: 1.2em;
             margin-bottom: 10px;
@@ -87,7 +99,7 @@
             border-radius: 8px;
             overflow: hidden;
             margin: 30px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             font-family: 'Consolas', 'Courier New', monospace;
             font-size: 1em;
         }
@@ -123,55 +135,55 @@
         }
         /* Wireshark Mockups */
         .wireshark-mockup {
-            border: 2px solid #cbd5e1;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
             margin: 30px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .ws-toolbar {
-            background: #f1f5f9;
+            background: var(--ws-toolbar-bg);
             padding: 10px 15px;
-            border-bottom: 1px solid #cbd5e1;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 15px;
         }
         .ws-filter-bar {
             flex-grow: 1;
-            background: #dcfce7;
-            border: 1px solid #22c55e;
+            background: #064e3b;
+            border: 1px solid #10b981;
             padding: 8px 15px;
             border-radius: 4px;
             font-family: monospace;
-            color: #166534;
+            color: #34d399;
         }
         .ws-packet-list {
-            background: white;
+            background: var(--ws-row-odd);
             font-family: 'Consolas', monospace;
             font-size: 0.95em;
-            border-bottom: 2px solid #cbd5e1;
+            border-bottom: 2px solid var(--border-color);
         }
         .ws-header-row {
             display: grid;
             grid-template-columns: 50px 100px 150px 150px 80px 300px;
-            background: #e2e8f0;
+            background: var(--ws-header-bg);
             padding: 8px 15px;
             font-weight: bold;
-            border-bottom: 1px solid #cbd5e1;
+            border-bottom: 1px solid var(--border-color);
         }
         .ws-row {
             display: grid;
             grid-template-columns: 50px 100px 150px 150px 80px 300px;
             padding: 8px 15px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
         }
-        .ws-row:nth-child(even) { background: #f8fafc; }
-        .ws-row.highlight-ping { background: #fef08a; } /* Yellow for ICMP */
-        .ws-row.highlight-error { background: #fca5a5; } /* Red for ICMP Errors */
+        .ws-row:nth-child(even) { background: var(--ws-row-even); }
+        .ws-row.highlight-ping { background: #854d0e; color: white; } /* Dark Yellow for ICMP */
+        .ws-row.highlight-error { background: #7f1d1d; color: white; } /* Dark Red for ICMP Errors */
         .ws-packet-details {
             padding: 15px;
-            background: white;
+            background: var(--ws-details-bg);
             font-family: 'Consolas', monospace;
             height: auto;
         }
@@ -181,7 +193,7 @@
         }
         .tree-node::before {
             content: "▶ ";
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 0.8em;
         }
         .tree-node.expanded::before {
@@ -189,8 +201,8 @@
         }
         .tree-child {
             margin-left: 20px;
-            color: #334155;
-            border-left: 1px dashed #cbd5e1;
+            color: #cbd5e1;
+            border-left: 1px dashed var(--border-color);
             padding-left: 10px;
         }
         /* Table Design */
@@ -198,25 +210,27 @@
             width: 100%;
             border-collapse: collapse;
             margin: 30px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border-radius: 8px;
             overflow: hidden;
+            background: var(--ws-row-odd);
         }
         th, td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
         }
         th {
             background-color: var(--primary);
-            color: white;
+            color: #0f172a;
             font-size: 1.1em;
+            font-weight: bold;
         }
         tr:nth-child(even) {
-            background-color: #f8fafc;
+            background-color: var(--ws-row-even);
         }
         tr:hover {
-            background-color: #f1f5f9;
+            background-color: var(--ws-header-bg);
         }
     </style>
 </head>
@@ -308,8 +322,8 @@ Approximate round trip times in milli-seconds:
          ========================================== -->
     <h2 style="margin-top: 60px;">Part B: Analysis of ICMP and Traceroute Messages</h2>
     
-    <div class="concept-box" style="background:#e0e7ff; border-color:#6366f1;">
-        <div class="concept-title" style="color:#4338ca;">🕵️‍♂️ Concept Check: The TTL Trick!</div>
+    <div class="concept-box" style="background:#1e3a8a; border-color:#3b82f6;">
+        <div class="concept-title" style="color:#60a5fa;">🕵️‍♂️ Concept Check: The TTL Trick!</div>
         <p>Traceroute is a genius hack. How do we find out the IP address of every router between us and Google? <br><br>
         We intentionally break packets by manipulating the <strong>TTL (Time to Live)</strong>! <br>
         - We send a ping to Google with <code>TTL=1</code>. The very 1st router receives it, drops TTL to 0, kills the packet, and angrily replies: <em>"Hey! Time Exceeded!"</em> (Boom, we just learned the 1st router's IP).<br>
@@ -418,7 +432,7 @@ Trace complete.</div>
         </tbody>
     </table>
 
-    <div style="text-align: center; margin-top: 50px; padding: 20px; background: #e2e8f0; border-radius: 8px;">
+    <div style="text-align: center; margin-top: 50px; padding: 20px; background: var(--step-bg); border-radius: 8px;">
         <h3 style="margin-top:0;">🎉 You have mastered Experiment 12!</h3>
         <p>Remember: PING uses Type 8 / Type 0. Traceroute uses the "TTL trick" to force routers to send Type 11 errors.</p>
     </div>

@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiment 8: The Ultimate Wireshark Masterclass</title>
+    <title>Experiment 8: The Ultimate Wireshark Masterclass (Dark Mode)</title>
     <style>
-        /* Modern Premium CSS Design */
+        /* Modern Premium Dark Mode CSS */
         :root {
-            --primary: #1a56db;
+            --primary: #60a5fa;
             --secondary: #3b82f6;
-            --bg-color: #f4f7f6;
-            --text-main: #333;
-            --code-bg: #1e293b;
+            --bg-color: #0f172a;
+            --text-main: #f8fafc;
+            --code-bg: #020617;
             --code-text: #10b981;
+            --container-bg: #1e293b;
+            --border-color: #334155;
+            --step-bg: #334155;
+            --concept-bg: #451a03;
+            --concept-border: #f59e0b;
+            --concept-text: #fcd34d;
+            --ws-toolbar-bg: #0f172a;
+            --ws-header-bg: #334155;
+            --ws-row-odd: #1e293b;
+            --ws-row-even: #0f172a;
+            --ws-highlight: #1e40af;
+            --ws-details-bg: #0f172a;
+            --text-muted: #94a3b8;
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -25,39 +38,39 @@
         .container {
             max-width: 1100px;
             margin: 40px auto;
-            background: #fff;
+            background: var(--container-bg);
             padding: 50px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         h1 {
             color: var(--primary);
-            border-bottom: 3px solid #e5e7eb;
+            border-bottom: 3px solid var(--border-color);
             padding-bottom: 15px;
             font-size: 2.5em;
             text-align: center;
         }
         h2 {
-            color: var(--secondary);
+            color: var(--primary);
             margin-top: 40px;
             font-size: 1.8em;
             border-left: 5px solid var(--secondary);
             padding-left: 15px;
         }
         h3 {
-            color: #4b5563;
+            color: #cbd5e1;
             font-size: 1.4em;
         }
         p {
             font-size: 1.1em;
         }
         .step-container {
-            background: #eff6ff;
+            background: var(--step-bg);
             border-left: 5px solid var(--secondary);
             padding: 20px;
             margin: 20px 0;
             border-radius: 0 8px 8px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .step-title {
             font-weight: bold;
@@ -76,17 +89,17 @@
             display: inline-block;
             margin: 10px 0;
             letter-spacing: 1px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
         }
         .concept-box {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
+            background: var(--concept-bg);
+            border: 1px solid var(--concept-border);
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
         }
         .concept-title {
-            color: #d97706;
+            color: var(--concept-text);
             font-weight: bold;
             font-size: 1.2em;
             margin-bottom: 10px;
@@ -95,16 +108,16 @@
         }
         /* Wireshark Mockups */
         .wireshark-mockup {
-            border: 2px solid #cbd5e1;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
             margin: 30px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .ws-toolbar {
-            background: #f1f5f9;
+            background: var(--ws-toolbar-bg);
             padding: 10px 15px;
-            border-bottom: 1px solid #cbd5e1;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 15px;
@@ -116,7 +129,7 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .ws-icon-stop {
             background: #ef4444;
@@ -125,42 +138,42 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .ws-filter-bar {
             flex-grow: 1;
-            background: #dcfce7;
-            border: 1px solid #22c55e;
+            background: #064e3b;
+            border: 1px solid #10b981;
             padding: 8px 15px;
             border-radius: 4px;
             font-family: monospace;
-            color: #166534;
+            color: #34d399;
         }
         .ws-packet-list {
-            background: white;
+            background: var(--ws-row-odd);
             font-family: 'Consolas', monospace;
             font-size: 0.95em;
-            border-bottom: 2px solid #cbd5e1;
+            border-bottom: 2px solid var(--border-color);
         }
         .ws-header-row {
             display: grid;
             grid-template-columns: 50px 100px 150px 150px 80px 300px;
-            background: #e2e8f0;
+            background: var(--ws-header-bg);
             padding: 8px 15px;
             font-weight: bold;
-            border-bottom: 1px solid #cbd5e1;
+            border-bottom: 1px solid var(--border-color);
         }
         .ws-row {
             display: grid;
             grid-template-columns: 50px 100px 150px 150px 80px 300px;
             padding: 8px 15px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
         }
-        .ws-row:nth-child(even) { background: #f8fafc; }
-        .ws-row.highlight { background: #bfdbfe; }
+        .ws-row:nth-child(even) { background: var(--ws-row-even); }
+        .ws-row.highlight { background: var(--ws-highlight); color: white; }
         .ws-packet-details {
             padding: 15px;
-            background: white;
+            background: var(--ws-details-bg);
             font-family: 'Consolas', monospace;
             height: 200px;
             overflow-y: auto;
@@ -171,7 +184,7 @@
         }
         .tree-node::before {
             content: "▶ ";
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 0.8em;
         }
         .tree-node.expanded::before {
@@ -179,18 +192,18 @@
         }
         .tree-child {
             margin-left: 20px;
-            color: #334155;
-            border-left: 1px dashed #cbd5e1;
+            color: #cbd5e1;
+            border-left: 1px dashed var(--border-color);
             padding-left: 10px;
         }
         .keyboard-key {
-            background: #e2e8f0;
-            border: 1px solid #cbd5e1;
+            background: #334155;
+            border: 1px solid #475569;
             border-radius: 4px;
             padding: 2px 6px;
             font-family: monospace;
             font-weight: bold;
-            box-shadow: 0 2px 0 #cbd5e1;
+            box-shadow: 0 2px 0 #475569;
         }
     </style>
 </head>
@@ -341,7 +354,7 @@
         <div class="step-title">Step 3: The Magic Trick - Follow TCP Stream</div>
         <p>If you want to see the entire conversation assembled together, do this:</p>
         <p><strong>Where to click:</strong> Right-click on ANY of the TCP packets belonging to your download. In the menu that pops up, click <strong>Follow</strong> → <strong>TCP Stream</strong>.</p>
-        <p>A new window will pop up showing the raw data stream. Client requests will be in <span style="color:#ef4444; font-weight:bold;">Red</span>, and Server responses will be in <span style="color:#1a56db; font-weight:bold;">Blue</span>.</p>
+        <p>A new window will pop up showing the raw data stream. Client requests will be in <span style="color:#f87171; font-weight:bold;">Red</span>, and Server responses will be in <span style="color:#60a5fa; font-weight:bold;">Blue</span>.</p>
     </div>
 
     <div class="step-container">
@@ -350,7 +363,7 @@
         <p>Look for the <code>[FIN, ACK]</code> flag. This stands for "Finish". The other side will reply with an <code>[ACK]</code>, gracefully closing the socket.</p>
     </div>
 
-    <div style="text-align: center; margin-top: 50px; padding: 20px; background: #e2e8f0; border-radius: 8px;">
+    <div style="text-align: center; margin-top: 50px; padding: 20px; background: var(--step-bg); border-radius: 8px;">
         <h3 style="margin-top:0;">🎉 You are now ready to ace Experiment 8!</h3>
         <p>Remember: Ethernet is Layer 2 (MAC). IP is Layer 3 (Routing). TCP is Layer 4 (Reliability). HTTP is Layer 7 (Application).</p>
     </div>
